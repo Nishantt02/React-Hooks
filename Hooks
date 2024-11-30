@@ -1,0 +1,117 @@
+import { useState,useCallback,useEffect, useRef} from 'react'
+
+import './App.css'
+
+function App() {
+  const[length, setlength] = useState(8);
+  const[number,setnumber]=useState(false);
+  const[charallowed,setcharallowed]=useState(false);
+  const[password,setpassword]=useState(false);
+
+//usecallback hooks 
+  const passwordgenerator=useCallback(()=>{
+    let pass="";
+    let str="ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz"
+
+    if(number)
+    {
+      str+="0123456789"
+    }
+    if(charallowed)
+    {
+      str+="!@#$%^&*()_+?/"
+    }
+
+    for(let i=1;i<=length;i++){
+     
+      let char = Math.floor(Math.random() * str.length);
+
+      pass+=str.charAt(char);
+    }
+    setpassword(pass);
+    // these are the dependecies for the password 
+  },[length,number,charallowed])
+
+  
+// useref hooks 
+const passwordref=useRef(null)
+
+// useeffect hook
+  useEffect(()=>{
+  passwordgenerator()
+  },[length,number,charallowed,passwordgenerator])
+
+
+  const copypasswordtoclickboard=useCallback(()=>{
+    passwordref.current?.select()              // it is used for the selection line 
+    passwordref.current?.setSelectionRange(0,5);     // it is selection of the value 
+    window.navigator.clipboard.writeText(password)
+  },[])
+
+  
+
+  return (
+
+    <div className=" w-full max-w-md flex items-center justify-center min-h-screen px-15 py-23 mx-96 bg-gray-1200">
+      <div className="w-full max-w-md bg-black shadow-md rounded-lg px-15 py-7 text-center">
+        {/* Title */}
+        <h1 className="text-white text-2xl font-bold mb-6">Password Generator</h1>
+
+        {/* Input Field */}
+        <div className="flex shadow-lg text-center rounded-lg overflow-hidden mb-4">
+          <input
+            type="text"
+            value={password}
+            className="outline-none w-full py-2 text-center px-4 text-black"
+            placeholder="Generated password"
+            ref={passwordref}
+          />
+           <button
+           onClick={copypasswordtoclickboard}
+            className='outline no-underline bg-white text-xl'>copy</button>
+        </div> 
+
+{/* It is for the length slider  */}
+        <div className='flex text-sm gap-x-2'>
+         <div className='flex items-center gap-x-1'>
+          <input type="range"
+          min={6}
+          max={100}
+          value={length}
+          className='cursor-pointer'
+          onChange={(e)=>{setlength(e.target.value)}} 
+           />
+         <div className='text-base bg-white'><label>length:{length}</label></div>
+          </div> 
+
+   {/* It is for the number text box  */}
+          <div className="flex text-sm gap-x-2 items-center">
+          <input type="checkbox"
+          defaultChecked={setnumber}
+          id=" numberInput"
+          onChange={()=>{setnumber((prev)=>!prev)}}
+           />
+             <div className='text-base bg-white'><label htmlFor='numberinput'>Numbers</label></div>
+           
+        </div>
+
+{/* It is for the character  */}
+        <div className="flex text-sm gap-x-2 items-center">
+          <input type="checkbox"
+          defaultChecked={setcharallowed}
+          id=" numberInput"
+          onChange={()=>{setcharallowed((prev)=>!prev)}}
+           />
+             <div className='text-base bg-white'><label htmlFor='characterInput'>Characters</label></div>
+           
+        </div>
+        
+      </div>
+    </div>
+          </div> 
+);
+};
+
+          
+
+export default App;
